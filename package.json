@@ -1,0 +1,29 @@
+{
+  "name": "vite-plugin-squirrellyjs",
+  "version": "1.0.0",
+  "description": "Vite plugin for SquirrellyJS support in HTML",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:reedhewitt/vite-plugin-squirrellyjs.git"
+  },
+  "author": "Reed Hewitt <reed@reedhewitt.com>",
+  "license": "MIT",
+  "keywords": [
+    "vite",
+    "squirrelljs",
+    "static",
+    "site",
+    "generator"
+  ],
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/reedhewitt/vite-plugin-squirrellyjs/issues"
+  },
+  "homepage": "https://github.com/reedhewitt/vite-plugin-squirrellyjs#readme",
+  "scripts": {},
+  "dependencies": {
+    "squirrelly": "^9.0.0",
+    "vite": "^4.3.9"
+  }
+}
