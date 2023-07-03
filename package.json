@@ -1,15 +1,19 @@
 {
-  "name": "vite-plugin-squirrellyjs",
+  "name": "rollup-plugin-squirrelly",
   "version": "1.0.0",
-  "description": "Vite plugin for SquirrellyJS support in HTML",
-  "main": "index.js",
+  "description": "Rollup/Vite plugin for SquirrellyJS support in HTML",
+  "main": "./index.js",
+  "exports": "./index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:reedhewitt/vite-plugin-squirrellyjs.git"
+    "url": "git@github.com:reedhewitt/rollup-plugin-squirrelly.git"
   },
   "author": "Reed Hewitt <reed@reedhewitt.com>",
   "license": "MIT",
   "keywords": [
+    "rollup-plugin",
+    "vite-plugin",
+    "rollup",
     "vite",
     "squirrelljs",
     "static",
@@ -18,12 +22,15 @@
   ],
   "private": false,
   "bugs": {
-    "url": "https://github.com/reedhewitt/vite-plugin-squirrellyjs/issues"
+    "url": "https://github.com/reedhewitt/rollup-plugin-squirrelly/issues"
   },
-  "homepage": "https://github.com/reedhewitt/vite-plugin-squirrellyjs#readme",
+  "homepage": "https://github.com/reedhewitt/rollup-plugin-squirrelly#readme",
   "scripts": {},
   "dependencies": {
     "squirrelly": "^9.0.0",
     "vite": "^4.3.9"
+  },
+  "devDependencies": {
+    "vite-plugin-inspect": "^0.7.32"
   }
 }
