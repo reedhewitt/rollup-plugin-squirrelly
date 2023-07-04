@@ -8,6 +8,7 @@
     "type": "git",
     "url": "git@github.com:reedhewitt/vite-plugin-squirrelly.git"
   },
+  "type": "module",
   "author": "Reed Hewitt <reed@reedhewitt.com>",
   "license": "MIT",
   "keywords": [
