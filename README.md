@@ -3,7 +3,9 @@
 
 This plugin applies the [Squirrelly](https://squirrelly.js.org/) renderer to the input files, which is awesome for generating a static site. Inspired by [vite-plugin-handlebars](https://github.com/alexlafroscia/vite-plugin-handlebars).
 
-Supposing you have some HTML template files in `./src`, some HTML partials in `./partials`, and a JSON file with template values in `./data.json`, your `vite.config.js` could look like:
+## Usage
+
+Supposing you have some HTML files in `./src`, some partials in `./partials`, and a JSON file with template values in `./data.json`, your `vite.config.js` could look like:
 
 ```js
 import Squirelly from 'vite-plugin-squirrelly';
@@ -16,7 +18,9 @@ export default {
   build: {
     outDir: '../dist', // relative to 'src'
     rollupOptions: {
-      // Get all HTML files in an object in which the relative file paths are used as both keys and values.
+      // Get all HTML files in an object. The relative file paths are used as both keys and values.
+      // Note that these files should have a lowercase file extension that Vite understands,
+      // such as *.html. By default you can't use *.sqrl for the input files.
       input: Object.fromEntries(globSync('src/**/*.html').map(file => [file, file]))
     }
   },
@@ -24,6 +28,8 @@ export default {
     Squirelly({
       // Parse the JSON and use it as the data arg for Squirrelly.render().
       data: JSON.parse(readFileSync('data.json', 'utf8')),
+      
+      // The partials directory relative to the Vite root.
       partialsDir: '../partials'
     })
   ],
@@ -38,7 +44,8 @@ The object passed to the `Squirrelly()` plugin can include more:
 
 ```js
 {
-  // Data for your templates.
+  // Data for your templates as an object or a function that returns an object
+  // (see below for details on using a function).
   data: {
     siteName: 'My Website',
     copyrightYear: (new Date()).getFullYear()
@@ -49,8 +56,11 @@ The object passed to the `Squirrelly()` plugin can include more:
     varName: 'x'
   },
   
-  // The directory where partials are stored relative to the Vite root.
+  // The directories where partials and layouts are stored relative to the Vite root.
+  // Unlike the build.rollupOptions.input files in the example above, your partials
+  // and layouts can use either *.html or *.sqrl extensions.
   partialsDir: '../partials',
+  layoutsDir: '../layouts',
   
   // Filters to define in Squirrelly.
   filters: {
@@ -59,6 +69,7 @@ The object passed to the `Squirrelly()` plugin can include more:
     }
   },
   
+  // Helpers to define in Squirrelly.
   helpers: {
     myhelper: function(content, blocks, config){
       // Do something...
@@ -66,7 +77,7 @@ The object passed to the `Squirrelly()` plugin can include more:
   },
   
   // Optional render callback to be used when the Squirrelly async option is set to true.
-  renderCallback: function(err, templateReturn){
+  renderCallback(err, templateReturn){
     // Do something...
   }
 }
@@ -78,18 +89,20 @@ And finally, the `data` item can be a function that receives the current page as
 // Defined above the "export default" Vite config object:
 const dataObject = JSON.parse(readFileSync('data.json', 'utf8'));
 
-// Object to pass into Squirrelly():
+// Object passed to Squirrelly():
 {
-  async data(relPath){
+  data(relPath){
     // Tell every page what its path is.
     dataObject.relPath = relPath;
     
     // Also format a clean path with index.html and trailing slash removed (except root slash).
-    dataObject.relPathClean = relPath.replace(/((?<!^)\/)?index\.html$/, '');
+    dataObject.relPathClean = relPath.replace(/((?<!^)\/)?index\.(html|sqrl)$/, '');
+    
+    // Do any other page-specific stuff with the data...
     
     return dataObject;
   }
 }
 ```
 
-That's all, folks! Consult the [Squirrelly docs](https://squirrelly.js.org/docs) for details about template syntax and API options.
+Consult the [Squirrelly docs](https://squirrelly.js.org/docs) for details about template syntax and API options. As of this writing, layouts are not well documented in Squirrelly, but [you can see some examples here](https://github.com/squirrellyjs/squirrelly/tree/master/test/templates).

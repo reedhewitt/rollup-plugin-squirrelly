@@ -3,14 +3,46 @@ import { normalize, relative, resolve, sep } from 'path';
 import { globSync } from 'glob';
 import { readFileSync } from 'fs';
 
+// From MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
+// Define filters and helpers in Sqrl.
+function defineFH(fh, type){
+  if(!fh) return;
+  const names = Object.keys(fh);
+  for(let i = 0; i < names.length; i++){
+    if(typeof fh[names[i]] === 'function'){
+      Sqrl[type].define(names[i], fh[names[i]]);
+    }
+  }
+};
+
+// Glob a directory of partials or layouts and define them in Sqrl.
+function definePL(plDir, root, sqrlOptions){
+  if(!plDir) return;
+  
+  const trailingSlashRegex = new RegExp(escapeRegExp(sep) + '$');
+  
+  // Make sure plDir is an absolute path with no trailing slash.
+  plDir = resolve(root, normalize(plDir).replace(trailingSlashRegex, ''));
+  
+  const plFiles = globSync(plDir + '/**/*.{html,sqrl}');
+  
+  for(let i = 0; i < plFiles.length; i++){
+    const plRelative = relative(plDir, plFiles[i]);
+    const plName = plRelative.replace(/\.(html|sqrl)$/, '');
+    const plContent = readFileSync(plFiles[i], 'utf8');
+    Sqrl.templates.define(plName, Sqrl.compile(plContent, Sqrl.getConfig(sqrlOptions)));
+  }
 }
 
 function Squirelly({
   data = {},
   options = {},
   partialsDir,
+  layoutsDir,
   filters,
   helpers,
   renderCallback
@@ -18,27 +50,11 @@ function Squirelly({
   // The root dir will be defined in the configResolved hook method.
   let root;
   
-  const trailingSlashRegex = new RegExp( escapeRegExp(sep) + '$');
+  const trailingSlashRegex = new RegExp(escapeRegExp(sep) + '$');
   
-  // Define filters that were passed by the user.
-  if(filters){
-    const filterNames = Object.keys(filters);
-    for(let i = 0; i < filterNames.length; i++){
-      if(typeof filters[filterNames[i]] === 'function'){
-        Sqrl.filters.define(filterNames[i], filters[filterNames[i]]);
-      }
-    }
-  }
-  
-  // Define helpers that were passed by the user.
-  if(helpers){
-    const helperNames = Object.keys(helpers);
-    for(let i = 0; i < helperNames.length; i++){
-      if(typeof helpers[helperNames[i]] === 'function'){
-        Sqrl.helpers.define(helperNames[i], helpers[helperNames[i]]);
-      }
-    }
-  }
+  // Define filters/helpers that were passed by the user.
+  defineFH(filters, 'filters');
+  defineFH(helpers, 'helpers');
   
   return {
     name: 'squirelly',
@@ -48,28 +64,20 @@ function Squirelly({
       // Root dir with trailing slash removed.
       root = normalize(viteConfig.root).replace(trailingSlashRegex, '');
       
-      // Glob the partials directory and define each HTML file as a partial.
-      if(partialsDir){
-        // Make sure partialsDir is an absolute path with no trailing slash.
-        partialsDir = resolve(root, normalize(partialsDir).replace(trailingSlashRegex, ''));
-        
-        const partialFiles = globSync(partialsDir + '/**/*.html');
-        
-        for(let i = 0; i < partialFiles.length; i++){
-          const partialRelative = relative(partialsDir, partialFiles[i]);
-          const partialName = partialRelative.replace(/\.html$/i, '');
-          const partialContent = readFileSync(partialFiles[i], 'utf8');
-          Sqrl.templates.define(partialName, Sqrl.compile(partialContent, Sqrl.getConfig(options)));
-        }
-      }
+      // Now that we know root, we can locate the directories for partials and
+      // layouts to define each of them.
+      definePL(partialsDir, root, options);
+      definePL(layoutsDir, root, options);
     },
     
     async transform(html, id){
       // Page path relative to root.
       const relPath = sep + relative(root, id).replace(trailingSlashRegex, '');
       
-      const templateData = typeof data === 'function' ? await data(relPath) : data;
+      // Get template data, whether it is a function or a plain object.
+      const templateData = typeof data === 'function' ? data(relPath) : data;
       
+      // Return the rendered content.
       return Sqrl.render(html, templateData, options, renderCallback);
     }
   };
