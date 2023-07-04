@@ -1,7 +1,9 @@
 # vite-plugin-squirrelly
 **A Vite plugin to render files with SquirrellyJS**
 
-This plugin applies the [Squirrelly](https://squirrelly.js.org/) renderer to the input files, which is awesome for generating a static site. Inspired by [vite-plugin-handlebars](https://github.com/alexlafroscia/vite-plugin-handlebars).
+This plugin applies the [Squirrelly](https://squirrelly.js.org/) renderer to the input files, which is awesome for generating a static site.
+
+Inspired by [vite-plugin-handlebars](https://github.com/alexlafroscia/vite-plugin-handlebars).
 
 ## Usage
 
