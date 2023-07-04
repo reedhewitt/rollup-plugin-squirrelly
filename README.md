@@ -14,9 +14,9 @@ import { readFileSync } from 'fs';
 
 export default {
   root: 'src',
-  publicDir: '../public', // relative to 'src'
+  publicDir: '../public', // relative to Vite root
   build: {
-    outDir: '../dist', // relative to 'src'
+    outDir: '../dist', // relative to Vite root
     rollupOptions: {
       // Get all HTML files in an object. The relative file paths are used as both keys and values.
       // Note that these files should have a lowercase file extension that Vite understands,
