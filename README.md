@@ -5,6 +5,12 @@ This plugin applies the [Squirrelly](https://squirrelly.js.org/) renderer to the
 
 Inspired by [vite-plugin-handlebars](https://github.com/alexlafroscia/vite-plugin-handlebars).
 
+## Installation
+
+```
+npm install --save-dev reedhewitt/vite-plugin-squirrell
+```
+
 ## Usage
 
 Supposing you have some HTML files in `./src`, some partials in `./partials`, and a JSON file with template values in `./data.json`, your `vite.config.js` could look like:
