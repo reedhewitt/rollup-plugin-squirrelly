@@ -1,12 +1,12 @@
-# rollup-plugin-squirrelly
-**A Rollup/Vite plugin to render files with SquirrellyJS**
+# vite-plugin-squirrelly
+**A Vite plugin to render files with SquirrellyJS**
 
-This plugin applies the [Squirrelly](https://squirrelly.js.org/) renderer to the input files, which is awesome if you have a static site and just want to parse some Squirrelly templates without getting a more complex static site generator involved.
+This plugin applies the [Squirrelly](https://squirrelly.js.org/) renderer to the input files, which is awesome for generating a static site. Inspired by [vite-plugin-handlebars](https://github.com/alexlafroscia/vite-plugin-handlebars).
 
-Supposing you have some HTML template files in the `./src/` directory of your project and a JSON file with template values in `./data.json`, your `vite.config.js` file could look like:
+Supposing you have some HTML template files in `./src`, some HTML partials in `./partials`, and a JSON file with template values in `./data.json`, your `vite.config.js` could look like:
 
 ```js
-import Squirelly from '../../../Code/rollup-plugin-squirrelly/index.js';
+import Squirelly from 'vite-plugin-squirrelly';
 import { globSync } from 'glob';
 import { readFileSync } from 'fs';
 
@@ -23,14 +23,73 @@ export default {
   plugins: [
     Squirelly({
       // Parse the JSON and use it as the data arg for Squirrelly.render().
-      data: JSON.parse(readFileSync('data.json'))
+      data: JSON.parse(readFileSync('data.json', 'utf8')),
+      partialsDir: '../partials'
     })
   ],
 };
 ```
 
-When you run `vite build`, the HTML files will be parsed with Squirrelly and output to the `./dist/` directory.
+When you run `vite build`, the HTML files will be parsed with Squirrelly and output to `./dist`.
 
-I just started working on this, so it is a work-in-progress (or maybe more like a proof of concept).
+## Plugin Options
 
-Inspired by [vite-plugin-handlebars](https://github.com/alexlafroscia/vite-plugin-handlebars).
+The object passed to the `Squirrelly()` plugin can include more:
+
+```js
+{
+  // Data for your templates.
+  data: {
+    siteName: 'My Website',
+    copyrightYear: (new Date()).getFullYear()
+  },
+  
+  // Config options to apply to Squirrelly.
+  options: {
+    varName: 'x'
+  },
+  
+  // The directory where partials are stored relative to the Vite root.
+  partialsDir: '../partials',
+  
+  // Filters to define in Squirrelly.
+  filters: {
+    myfilter: function(str) {
+      // Do something...
+    }
+  },
+  
+  helpers: {
+    myhelper: function(content, blocks, config){
+      // Do something...
+    }
+  },
+  
+  // Optional render callback to be used when the Squirrelly async option is set to true.
+  renderCallback: function(err, templateReturn){
+    // Do something...
+  }
+}
+```
+
+And finally, the `data` item can be a function that receives the current page as an argument and returns a customized data object.
+
+```js
+// Defined above the "export default" Vite config object:
+const dataObject = JSON.parse(readFileSync('data.json', 'utf8'));
+
+// Object to pass into Squirrelly():
+{
+  async data(relPath){
+    // Tell every page what its path is.
+    dataObject.relPath = relPath;
+    
+    // Also format a clean path with index.html and trailing slash removed (except root slash).
+    dataObject.relPathClean = relPath.replace(/((?<!^)\/)?index\.html$/, '');
+    
+    return dataObject;
+  }
+}
+```
+
+That's all, folks! Consult the [Squirrelly docs](https://squirrelly.js.org/docs) for details about template syntax and API options.
