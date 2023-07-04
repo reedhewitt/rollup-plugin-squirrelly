@@ -64,7 +64,7 @@ The object passed to the `Squirrelly()` plugin can include more:
   
   // Filters to define in Squirrelly.
   filters: {
-    myfilter: function(str) {
+    myfilter: function(str){
       // Do something...
     }
   },
