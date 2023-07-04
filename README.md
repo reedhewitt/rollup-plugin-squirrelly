@@ -8,7 +8,7 @@ Inspired by [vite-plugin-handlebars](https://github.com/alexlafroscia/vite-plugi
 ## Installation
 
 ```
-npm install --save-dev reedhewitt/vite-plugin-squirrell
+npm install --save-dev vite-plugin-squirrelly
 ```
 
 ## Usage
